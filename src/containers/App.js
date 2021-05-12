@@ -2,9 +2,9 @@ import React, { useState } from "react";
 
 import classes from "./App.css";
 import Radium, { StyleRoot } from "radium";
-import Person from "./Person/Person";
+import Persons from "../components/Persons/Persons";
+import Cockpit from "../components/Cockpit/Cockpit";
 import styled from "styled-components";
-import ErrorBoundary from "./ErrorBoundary/ErrorBoundary";
 
 const App = (props) => {
   const StyledButton = styled.button`
@@ -69,48 +69,37 @@ const App = (props) => {
   };
 
   let persons = null;
-  let btnClasses = "";
 
   if (showPersons.showPersons) {
     persons = (
       <div>
-        {personsState.persons.map((person, index) => {
+        <Persons
+          persons={personsState.persons}
+          click={deletePersonHandler}
+          changed={nameChangeHandler}
+        />
+        {/* {personsState.persons.map((person, index) => {
           return (
-            <ErrorBoundary key={person.id}>
-              <Person
-                name={person.name}
-                click={() => deletePersonHandler(index)}
-                changed={(event) => nameChangeHandler(event, person.id)}
-              />
-            </ErrorBoundary>
+            <Person
+              key={person.id}
+              name={person.name}
+              click={() => deletePersonHandler(index)}
+              changed={(event) => nameChangeHandler(event, person.id)}
+            />
           );
-        })}
+        })} */}
       </div>
     );
-    btnClasses = classes.Red;
-  }
-
-  let assignedClasses = [];
-  if (personsState.persons.length <= 2) {
-    assignedClasses.push(classes.red);
-  }
-  if (personsState.persons.length <= 1) {
-    assignedClasses.push(classes.bold);
   }
 
   return (
     <StyleRoot>
-      <div className={classes.App}>
-        <p className={assignedClasses.join(" ")}>Qendrim Hasi</p>
-        <button
-          className={btnClasses}
-          // alt={showPersons.showPersons}
-          onClick={togglePersonsHandler}
-        >
-          Show or hide
-        </button>
-        {persons}
-      </div>
+      <Cockpit
+        showPersons={showPersons.showPersons}
+        click={togglePersonsHandler}
+        persons={personsState.persons}
+      />
+      <div className={classes.App}>{persons}</div>
     </StyleRoot>
   );
 };
