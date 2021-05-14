@@ -1,55 +1,86 @@
-import React, { useState } from "react";
+import React, { Component } from "react";
 
 import classes from "./App.css";
-import Radium, { StyleRoot } from "radium";
+import { StyleRoot } from "radium";
 import Persons from "../components/Persons/Persons";
 import Cockpit from "../components/Cockpit/Cockpit";
 import styled from "styled-components";
 
-const App = (props) => {
-  const StyledButton = styled.button`
-    background-color: ${(props) => (props.alt ? "red" : "green")};
-    color: white;
-    font: inherit;
-    border: 1px solid blue;
-    padding: 8px;
-    cursor: pointer;
-    &:hover {
-      background-color: ${(props) => (props.alt ? "salmon" : "lightgreen")};
-      color: black;
-    }
-  `;
+class App extends Component {
+  constructor(props) {
+    super(props);
+    console.log("[App.js] constructor");
+  }
+  // const StyledButton = styled.button`
+  //   background-color: ${(props) => (props.alt ? "red" : "green")};
+  //   color: white;
+  //   font: inherit;
+  //   border: 1px solid blue;
+  //   padding: 8px;
+  //   cursor: pointer;
+  //   &:hover {
+  //     background-color: ${(props) => (props.alt ? "salmon" : "lightgreen")};
+  //     color: black;
+  //   }
+  // `;
 
-  const [personsState, setPersons] = useState({
+  // const [personsState, setPersons] = useState({
+  //   persons: [
+  //     { id: "qwerty", name: "qendrim" },
+  //     { id: "asdfg", name: "john" },
+  //     { id: "zxcvb", name: "filon" },
+  //   ],
+  // });
+
+  state = {
     persons: [
       { id: "qwerty", name: "qendrim" },
       { id: "asdfg", name: "john" },
       { id: "zxcvb", name: "filon" },
     ],
-  });
-
-  const [showPersons, setShowPersons] = useState({
     showPersons: false,
-  });
+    showCockpit: true,
+  };
+  static getDerivedSateFromProps() {
+    console.log("[App.js] getDerivedSateFromProps");
+    return this.state;
+  }
+  // const [showPersons, setShowPersons] = useState({
+  //   showPersons: false,
+  // });
 
-  const nameChangeHandler = (event, id) => {
-    const personIndex = personsState.persons.findIndex((p) => {
+  componentDidMount() {
+    console.log("[App.js] componentDidMount");
+  }
+
+  nameChangeHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex((p) => {
       return p.id === id;
     });
-    const person = { ...personsState.persons[personIndex] };
+    const person = { ...this.state.persons[personIndex] };
 
     person.name = event.target.value;
 
-    const persons = [...personsState.persons];
+    const persons = [...this.state.persons];
     persons[personIndex] = person;
-    setPersons({ persons: persons });
+    this.setState({ persons: persons });
   };
 
-  const deletePersonHandler = (personIndex) => {
-    const persons = [...personsState.persons];
+  deletePersonHandler = (personIndex) => {
+    const persons = [...this.state.persons];
     persons.splice(personIndex, 1);
-    setPersons({ persons: persons });
+    this.setState({ persons: persons });
   };
+
+  shouldComponentUpdate() {
+    console.log("[App.js] shouldComponentUpdate");
+    return true;
+  }
+  // componentDidUpdate() {
+  //   console.log("[App.js] componentDidUpdate");
+  // }
+
+  componentWillUnmount() {}
 
   // const style = {
   //   backgroundColor: "green",
@@ -64,44 +95,48 @@ const App = (props) => {
   //   }
   // };
 
-  const togglePersonsHandler = () => {
-    setShowPersons({ showPersons: !showPersons.showPersons });
+  togglePersonsHandler = () => {
+    const doesShow = !this.state.showPersons;
+    this.setState({ showPersons: doesShow });
   };
 
-  let persons = null;
+  render() {
+    console.log("[App.js] render");
+    let persons = null;
+    if (this.state.showPersons) {
+      persons = (
+        <div>
+          <Persons
+            persons={this.state.persons}
+            click={this.deletePersonHandler}
+            changed={this.nameChangeHandler}
+          />
+        </div>
+      );
+    }
 
-  if (showPersons.showPersons) {
-    persons = (
-      <div>
-        <Persons
-          persons={personsState.persons}
-          click={deletePersonHandler}
-          changed={nameChangeHandler}
-        />
-        {/* {personsState.persons.map((person, index) => {
-          return (
-            <Person
-              key={person.id}
-              name={person.name}
-              click={() => deletePersonHandler(index)}
-              changed={(event) => nameChangeHandler(event, person.id)}
-            />
-          );
-        })} */}
+    return (
+      <div className={classes.App}>
+        <button
+          onClick={() => {
+            this.setState({ showCockpit: false });
+          }}
+        >
+          Remove Cockpit
+        </button>
+        {this.state.showCockpit ? (
+          <Cockpit
+            showPersons={this.state.showPersons}
+            click={this.togglePersonsHandler}
+            persons={this.state.persons}
+            title={this.props.appTitle}
+          />
+        ) : null}
+
+        {persons}
       </div>
     );
   }
-
-  return (
-    <StyleRoot>
-      <Cockpit
-        showPersons={showPersons.showPersons}
-        click={togglePersonsHandler}
-        persons={personsState.persons}
-      />
-      <div className={classes.App}>{persons}</div>
-    </StyleRoot>
-  );
-};
+}
 
 export default App;
