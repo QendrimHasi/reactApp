@@ -4,6 +4,9 @@ import classes from "./App.css";
 import { StyleRoot } from "radium";
 import Persons from "../components/Persons/Persons";
 import Cockpit from "../components/Cockpit/Cockpit";
+import withClass from "../hoc/withClass";
+import Aux from "../hoc/Auxiliary";
+import Auth from "../context/auth-context";
 import styled from "styled-components";
 
 class App extends Component {
@@ -40,6 +43,8 @@ class App extends Component {
     ],
     showPersons: false,
     showCockpit: true,
+    changedCounter: 0,
+    auth: false,
   };
   static getDerivedSateFromProps() {
     console.log("[App.js] getDerivedSateFromProps");
@@ -69,7 +74,12 @@ class App extends Component {
   deletePersonHandler = (personIndex) => {
     const persons = [...this.state.persons];
     persons.splice(personIndex, 1);
-    this.setState({ persons: persons });
+    this.setState((prevState, props) => {
+      return {
+        persons: persons,
+        changedCounter: prevState.changedCounter + 1,
+      };
+    });
   };
 
   shouldComponentUpdate() {
@@ -99,6 +109,9 @@ class App extends Component {
     const doesShow = !this.state.showPersons;
     this.setState({ showPersons: doesShow });
   };
+  loginHandler = () => {
+    this.setState({ auth: true });
+  };
 
   render() {
     console.log("[App.js] render");
@@ -110,13 +123,14 @@ class App extends Component {
             persons={this.state.persons}
             click={this.deletePersonHandler}
             changed={this.nameChangeHandler}
+            isAuth={this.state.auth}
           />
         </div>
       );
     }
 
     return (
-      <div className={classes.App}>
+      <Aux>
         <button
           onClick={() => {
             this.setState({ showCockpit: false });
@@ -124,19 +138,23 @@ class App extends Component {
         >
           Remove Cockpit
         </button>
-        {this.state.showCockpit ? (
-          <Cockpit
-            showPersons={this.state.showPersons}
-            click={this.togglePersonsHandler}
-            persons={this.state.persons}
-            title={this.props.appTitle}
-          />
-        ) : null}
+        <Auth.Provider
+          value={{ auth: this.state.auth, login: this.loginHandler }}
+        >
+          {this.state.showCockpit ? (
+            <Cockpit
+              showPersons={this.state.showPersons}
+              click={this.togglePersonsHandler}
+              personsLength={this.state.persons.length}
+              title={this.props.appTitle}
+            />
+          ) : null}
 
-        {persons}
-      </div>
+          {persons}
+        </Auth.Provider>
+      </Aux>
     );
   }
 }
 
-export default App;
+export default withClass(App, classes.App);

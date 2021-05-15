@@ -1,12 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import classes from "./Cockpit.css";
+import Auth from "../../context/auth-context";
 
 const Cockpit = (props) => {
+  const toggleBtnRef = React.useRef(null);
+  const authContext = useContext(Auth);
+
+  console.log(authContext.auth);
+
   useEffect(() => {
     console.log("useEffect");
-    setTimeout(() => {
-      alert("Save data to cloud");
-    }, 1000);
+    toggleBtnRef.current.click();
+    // setTimeout(() => {
+    //   alert("Save data to cloud");
+    // }, 1000);
     return () => {
       console.log("[Cockpit.js] clean up work in useEffect");
     };
@@ -24,10 +31,10 @@ const Cockpit = (props) => {
   if (props.showPersons) {
     btnClasses = classes.Red;
   }
-  if (props.persons.length <= 2) {
+  if (props.personsLength <= 2) {
     assignedClasses.push(classes.Red);
   }
-  if (props.persons.length <= 1) {
+  if (props.personsLength <= 1) {
     assignedClasses.push(classes.bold);
   }
   return (
@@ -35,14 +42,16 @@ const Cockpit = (props) => {
       <h1>{props.title}</h1>
       <p className={assignedClasses.join(" ")}>Qendrim Hasi</p>
       <button
+        ref={toggleBtnRef}
         className={btnClasses}
         // alt={showPersons.showPersons}
         onClick={props.click}
       >
         Show or hide
       </button>
+      {<button onClick={authContext.login}>Log in</button>}
     </div>
   );
 };
 
-export default Cockpit;
+export default React.memo(Cockpit);

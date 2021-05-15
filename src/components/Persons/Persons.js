@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 import Person from "./Person/Person";
 
-class Persons extends Component {
+class Persons extends PureComponent {
   render() {
     return this.props.persons.map((person, index) => {
       return (
@@ -19,15 +19,15 @@ class Persons extends Component {
     console.log("[Persons.js] componentWillUnmount");
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    console.log("[Persons.js] shouldComponentUpdate");
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   console.log("[Persons.js] shouldComponentUpdate");
 
-    if (nextProps.persons !== this.props.person) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  //   if (nextProps.persons !== this.props.person) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 }
 
 export default Persons;
